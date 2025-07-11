@@ -1,1 +1,6 @@
 # Skummy-Rummy
+This is a sibling project. We are creating a game.....
+<img width="1545" height="2000" alt="1" src="https://github.com/user-attachments/assets/9b3cc094-385c-49de-ab03-cdbba6c8ffa6" />
+<img width="1545" height="2000" alt="2" src="https://github.com/user-attachments/assets/66100709-0073-4526-8c97-a07482d11508" />
+
+Sibling roles are subject to change....
