@@ -1,0 +1,51 @@
+[gd_scene load_steps=2 format=3 uid="uid://ll7vguxv7su0"]
+
+[ext_resource type="Script" uid="uid://b8slykyvq7mvi" path="res://interactable objects/scripts/card.gd" id="1_g7eid"]
+
+[node name="Card" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_g7eid")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 191.0
+offset_bottom = 257.0
+
+[node name="rank" type="Label" parent="ColorRect"]
+layout_mode = 0
+offset_left = 44.0
+offset_top = 82.0
+offset_right = 155.0
+offset_bottom = 159.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "rank"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="suit_top" type="Label" parent="ColorRect"]
+layout_mode = 0
+offset_left = 151.0
+offset_right = 191.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "suit"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="suit_bottom" type="Label" parent="ColorRect"]
+layout_mode = 0
+offset_top = 234.0
+offset_right = 40.0
+offset_bottom = 257.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "suit"
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="."]
+show_behind_parent = true
+layout_mode = 0
+offset_right = 191.0
+offset_bottom = 257.0
+disabled = true
