@@ -1,3 +1,48 @@
-[gd_scene format=3 uid="uid://bdmf52q2ck8rl"]
+[gd_scene load_steps=2 format=3 uid="uid://bdmf52q2ck8rl"]
 
-[node name="PlayerInterface" type="Node2D"]
+[ext_resource type="Script" uid="uid://bv8m08cp11fp2" path="res://player/scripts/player_interface.gd" id="1_dyfmo"]
+
+[node name="PlayerInterface" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_dyfmo")
+
+[node name="PlayerHand" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 449.0
+offset_right = 1089.0
+offset_bottom = 648.0
+
+[node name="ReferenceRect" type="ReferenceRect" parent="PlayerHand"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+border_width = 5.0
+
+[node name="DrawnCard" type="MarginContainer" parent="."]
+layout_mode = 2
+offset_left = 450.0
+offset_top = 246.0
+offset_right = 580.0
+offset_bottom = 445.0
+
+[node name="ReferenceRect" type="ReferenceRect" parent="DrawnCard"]
+layout_mode = 2
+border_width = 5.0
+
+[node name="select button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1089.0
+offset_top = 449.0
+offset_right = 1152.0
+offset_bottom = 512.0
+text = "Select"
+
+[node name="reject button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1089.0
+offset_top = 578.0
+offset_right = 1152.0
+offset_bottom = 641.0
+text = "Reject"

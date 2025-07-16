@@ -10,10 +10,10 @@ func get_input():
 	velocity = input_direction * SPEED
 	
 
+# As soon as spawned in, get dealt and display hand in player_interface
 func _ready() -> void:
 	hand = Globals.deal()
 	$PlayerInterface.display_hand(hand)
-
 
 func _physics_process(_delta):
 	if movable:

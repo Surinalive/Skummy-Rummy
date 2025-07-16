@@ -10,13 +10,29 @@ extends Control
 signal card_toggled(card)
 
 func set_rank(rank: int) -> void:
-	card_rank = rank;
+	card_rank = rank
+	$ColorRect/rank.text = str(rank)
 
 func get_rank() -> int:
-	return card_rank;
+	return card_rank
 	
 func set_suit(suit: int) -> void:
-	card_suit = suit;
+	card_suit = suit
+	var text
+
+	match suit :
+		0:
+			text = "club"
+		1: 
+			text = "diamond"
+		2:
+			text = "heart"
+		3: 
+			text = "spade"
+	
+	$ColorRect/suit_top.text = text
+	$ColorRect/suit_bottom.text = text
+	
 	
 func get_suit() -> int:
 	return card_suit;
