@@ -1,25 +1,27 @@
 [gd_scene load_steps=5 format=3 uid="uid://7t8nh7uq3y5o"]
 
-[ext_resource type="Script" uid="uid://rjordpkd4tkx" path="res://player/scripts/player.gd" id="1_t0cpu"]
-[ext_resource type="Texture2D" uid="uid://jqij3kroptlo" path="res://art/icon.svg" id="2_8h4do"]
-[ext_resource type="PackedScene" uid="uid://bdmf52q2ck8rl" path="res://player/scenes/player_interface.tscn" id="2_rclgo"]
+[ext_resource type="Script" uid="uid://rjordpkd4tkx" path="res://player/scripts/player.gd" id="1_g1dw6"]
+[ext_resource type="PackedScene" uid="uid://bdmf52q2ck8rl" path="res://player/scenes/player_interface.tscn" id="2_yw30f"]
+[ext_resource type="Texture2D" uid="uid://jqij3kroptlo" path="res://art/icon.svg" id="3_qjkh3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_yw30f"]
 radius = 23.0
 
 [node name="Player" type="CharacterBody2D"]
-script = ExtResource("1_t0cpu")
+motion_mode = 1
+script = ExtResource("1_g1dw6")
 
-[node name="PlayerInterface" parent="." instance=ExtResource("2_rclgo")]
+[node name="PlayerInterface" parent="." instance=ExtResource("2_yw30f")]
 offset_left = -576.0
 offset_top = -329.0
 offset_right = -576.0
 offset_bottom = -329.0
+metadata/_edit_use_anchors_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(0, 1.90735e-06)
 scale = Vector2(0.335938, 0.320312)
-texture = ExtResource("2_8h4do")
+texture = ExtResource("3_qjkh3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_yw30f")

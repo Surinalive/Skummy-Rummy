@@ -11,15 +11,14 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	pass
 	
-func _input(event: InputEvent) -> void:
-	if allow_draw and event.is_action_pressed("action"):
-		var card = Globals.draw()
-		player.display_card_drawn(card)
+#func _input(event: InputEvent) -> void:
+#	if allow_draw and event.is_action_pressed("action"):
+#		var card = Game.draw()
+#		player.display_card_drawn(card)
 
 func _on_area_2d_body_entered(body: Node2D) -> void:
 	allow_draw = true
 	player = body
-
 
 func _on_area_2d_body_exited(body: Node2D) -> void:
 	allow_draw = false
