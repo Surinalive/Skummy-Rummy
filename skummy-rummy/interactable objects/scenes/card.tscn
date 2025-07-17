@@ -5,6 +5,10 @@
 [node name="Card" type="Control"]
 layout_mode = 3
 anchors_preset = 0
+offset_left = -74.0
+offset_top = -93.0
+offset_right = -74.0
+offset_bottom = -93.0
 size_flags_horizontal = 3
 script = ExtResource("1_g7eid")
 
@@ -12,13 +16,6 @@ script = ExtResource("1_g7eid")
 layout_mode = 0
 offset_right = 144.0
 offset_bottom = 192.0
-
-[node name="Button" type="Button" parent="ColorRect"]
-show_behind_parent = true
-layout_mode = 0
-offset_right = 144.0
-offset_bottom = 192.0
-disabled = true
 
 [node name="rank" type="Label" parent="ColorRect"]
 layout_mode = 0
@@ -50,3 +47,12 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 7
 text = "suit"
 vertical_alignment = 1
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_right = 144.0
+offset_bottom = 192.0
+disabled = true
+toggle_mode = true
+
+[connection signal="toggled" from="Button" to="." method="_on_button_toggled"]

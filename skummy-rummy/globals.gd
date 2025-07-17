@@ -32,7 +32,6 @@ func deal() -> Array:
 
 func draw() -> Node:
 	var card = deck_cards.pick_random()
-	print(card)
 	return card
 
 #TODO: fix logic later. adds card back to deck...

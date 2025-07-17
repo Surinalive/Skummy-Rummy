@@ -31,7 +31,7 @@ offset_bottom = 445.0
 layout_mode = 2
 border_width = 5.0
 
-[node name="select button" type="Button" parent="."]
+[node name="SelectButton" type="Button" parent="."]
 layout_mode = 0
 offset_left = 1089.0
 offset_top = 449.0
@@ -39,10 +39,13 @@ offset_right = 1152.0
 offset_bottom = 512.0
 text = "Select"
 
-[node name="reject button" type="Button" parent="."]
+[node name="RejectButton" type="Button" parent="."]
 layout_mode = 0
 offset_left = 1089.0
 offset_top = 578.0
 offset_right = 1152.0
 offset_bottom = 641.0
 text = "Reject"
+
+[connection signal="pressed" from="SelectButton" to="." method="_on_select_button_pressed"]
+[connection signal="pressed" from="RejectButton" to="." method="_on_reject_button_pressed"]

@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=4 uid="uid://ctlvoxkbt3icw"]
+[gd_scene load_steps=7 format=4 uid="uid://ctlvoxkbt3icw"]
 
 [ext_resource type="PackedScene" uid="uid://7t8nh7uq3y5o" path="res://player/scenes/player.tscn" id="1_xkndl"]
 [ext_resource type="Texture2D" uid="uid://bo57h4s0ysdpp" path="res://art/basic_tileset_and_assets_standard/water_and_island_tiles_v2.png" id="2_u44n3"]
 [ext_resource type="PackedScene" uid="uid://b4sk865thw1cw" path="res://interactable objects/scenes/table.tscn" id="3_u44n3"]
+[ext_resource type="PackedScene" uid="uid://2pdffq5kcdtn" path="res://interactable objects/scenes/card_spawn.tscn" id="4_sb48q"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_sb48q"]
 texture = ExtResource("2_u44n3")
@@ -493,7 +494,12 @@ tile_map_data = PackedByteArray("AAAAACQAAAAAAAkAAAAAACUAAAAAAAkAAAAAACYAAAAAAAk
 tile_set = SubResource("TileSet_t88pq")
 
 [node name="Player" parent="." instance=ExtResource("1_xkndl")]
+top_level = true
 position = Vector2(580, 316)
+motion_mode = 1
 
 [node name="Table" parent="." instance=ExtResource("3_u44n3")]
-position = Vector2(819, 380)
+position = Vector2(884, 316)
+
+[node name="Card_Spawner" parent="." instance=ExtResource("4_sb48q")]
+position = Vector2(129, 131)
