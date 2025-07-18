@@ -15,8 +15,8 @@ func _process(_delta: float) -> void:
 # NOTE, need to add powerup cards functionality
 # Generates our card deck!
 func generate_deck() -> void:
-	for i in 3:
-		for j in 12:
+	for i in 4:
+		for j in 13:
 			var card_scene = preload(CARD_SCENE_PATH)
 			var card = card_scene.instantiate()
 			card.set_suit(i + 1)
@@ -56,7 +56,38 @@ func new_game():
 func _on_start_timer_timeout() -> void:
 	pass # Replace with function body.
 	
+	
+func place_meld(cards : Array) -> void:
+	$Table.place_meld(cards)
+	
 # checking if the hand contains a valid meld
-#func meld_check(hand : Array) -> bool:
-	#for card in hand:
-		
+func meld_check(cards : Array) -> bool:
+	return check_run(cards) or check_set(cards)
+
+# TODO test!!!
+func check_run(cards : Array) -> bool:
+	var ranks = []
+	var suit = cards[0].get_suit()
+	
+	for card in cards:
+		if card.get_suit() != suit:
+			return false
+		ranks.append(card.get_rank())
+	
+	ranks.sort()
+	
+	for i in ranks.size() - 2:
+		if (ranks[i] != ranks[i + 1] - 1):
+			return false
+	
+	return true
+
+# TODO test!!!
+func check_set(cards : Array) -> bool:
+	var rank = cards[0].get_rank()
+	
+	for card in cards:
+		if card.get_rank() != rank:
+			return false
+			
+	return true

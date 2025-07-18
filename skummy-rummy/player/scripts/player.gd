@@ -6,6 +6,8 @@ var movable = true
 var screen_size #size of game window
 @export var at_spawn = false
 @export var at_table = false
+@onready var game = $".."
+signal place_meld(cards)
 
 #signal table_click_go
 signal hit # TODO NOTE adding this because I'm following the tutorial a bit Might be 
@@ -42,6 +44,8 @@ func card_drawn(card):
 # Allow player movement
 func set_movable(value):
 	movable = value
+	at_spawn = false
+	at_table = false
 
 # Return the player's current hand
 func get_hand() -> Array:
@@ -93,4 +97,21 @@ func set_at_table(value) -> void:
 	at_table = value
 
 func trade(drawn_card, selected_card):
-	$"..".trade(drawn_card, selected_card)
+	game.trade(drawn_card, selected_card)
+
+func attempt_meld():
+	set_movable(false)
+	set_at_table(true)
+	$PlayerInterface.cards_clickable()
+	$PlayerInterface.buttons_visible(true)
+
+func place_cards(cards : Array) -> bool:
+	if (!game.meld_check(cards)):
+		set_movable(true)
+		set_at_table(false)
+		return false
+	
+	set_movable(true)
+	set_at_table(false)
+	game.place_meld(cards)
+	return true
