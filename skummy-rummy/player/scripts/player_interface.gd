@@ -1,13 +1,13 @@
-extends Control
+extends CanvasLayer
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	buttons_visible(false)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
-
+func buttons_visible(value) -> void:
+	$SelectButton.visible = value
+	$RejectButton.visible = value
+	
 # Display cards dealt
 func display_hand(hand) -> void:
 	for card in hand:
@@ -24,6 +24,7 @@ func add_to_hand(card) -> void:
 func display_drawn_card(card) -> void:
 	$DrawnCard.add_child(card)
 	cards_clickable()
+	buttons_visible(true)
 
 # Allows cards in hand to be selected
 func cards_clickable() -> void:
@@ -51,15 +52,25 @@ func untoggle_rest(selected_card) -> void:
 # Adds drawn_card to hand and puts selected card back in deck
 # TODO adequate testing needed... Maybe on a smaller deck?
 func _on_select_button_pressed() -> void:
+	if $"..".at_spawn:
+		at_spawn_select()
+	else:
+		at_table_select()
+		
+func at_spawn_select() -> void:
 	var selected_card = get_selected_card()
 	var drawn_card = get_drawn_card()
-	#Game.trade(drawn_card, selected_card)
+	$"..".trade(drawn_card, selected_card)
 	$"..".remove_from_hand(selected_card)
 	$PlayerHand.remove_child(selected_card)
 	$DrawnCard.remove_child(drawn_card)
 	add_to_hand(drawn_card)
 	$"..".set_movable(true)
 	cards_unclickable()
+	buttons_visible(false)
+	
+func at_table_select() -> void:
+	pass
 	
 # Removes the drawn card from the screen
 func _on_reject_button_pressed() -> void:

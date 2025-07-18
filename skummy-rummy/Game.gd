@@ -55,3 +55,8 @@ func new_game():
 #NOTE the tutorial had this start two other timers....
 func _on_start_timer_timeout() -> void:
 	pass # Replace with function body.
+	
+# checking if the hand contains a valid meld
+#func meld_check(hand : Array) -> bool:
+	#for card in hand:
+		
