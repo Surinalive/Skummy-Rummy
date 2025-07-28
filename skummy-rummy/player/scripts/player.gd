@@ -9,11 +9,8 @@ var screen_size #size of game window
 @onready var game = $".."
 
 @onready var table_area : StaticBody2D
+@onready var spawn_area : StaticBody2D
 
-
-#NOTE lets try sending the table object to the player so the player can interact on it itself....
-
-#signal table_click_go
 signal hit # TODO NOTE adding this because I'm following the tutorial a bit Might be 
 #useful with powerups and multiplayer
 
@@ -22,21 +19,25 @@ func get_input():
 	var input_direction = Input.get_vector("left", "right", "up", "down")
 	velocity = input_direction * speed
 
-# used to check for single events....
-func _input(event):
-	if event.is_action_pressed("action"):
-		if (at_table):
-			set_movable(false)
-			$PlayerInterface.cards_clickable()
-			$PlayerInterface.buttons_visible(true)
-
 func _physics_process(_delta):
 	if movable:
 		get_input()
 		move_and_slide()
+
+# used to check for single events....
+func _input(event):
+	if event.is_action_pressed("action"):
+		if (at_table || at_spawn):
+			set_movable(false)
+			$PlayerInterface.cards_clickable()
+			$PlayerInterface.buttons_visible(true)
+			if at_spawn:
+				$PlayerInterface.display_drawn_card(spawn_area.draw_card())
+
+
 	
 
-# As soon as spawned in, get dealt and display hand in player_interface
+#? As soon as spawned in, get dealt and display hand in player_interface
 func _ready() -> void:
 	hide() #hides the player when the game starts
 	screen_size = get_viewport_rect().size
@@ -45,33 +46,27 @@ func _ready() -> void:
 # NOTE TODO Sets the players position at the start of the game...
 func start(pos):
 	position = pos
-	hand = $"..".deal()
+	hand = game.deal()
 	$PlayerInterface.display_hand(hand)
 	$CollisionShape2D.disabled = false
 	show()
 
-# Displays drawn card for the player
-func card_drawn(card):
-	set_movable(false)
-	set_at_spawn(true)
-	$PlayerInterface.display_drawn_card(card)
-
-# Allow player movement
+## Allow player movement
 func set_movable(value):
 	movable = value
 	if (value):
 		at_spawn = false
 		at_table = false
 
-# Return the player's current hand
+## Return the player's current hand
 func get_hand() -> Array:
 	return hand
 
-# Add card to player's hand
+## Add card to player's hand
 func add_to_hand(card) -> void:
 	hand.append(card)
 
-# Remove card from player's hand
+## Remove card from player's hand
 func remove_from_hand(card) -> void:
 	hand.erase(card)
 
@@ -106,14 +101,18 @@ func remove_from_hand(card) -> void:
 	## his signal isn't repeatedly sent
 	##$CollisionShape2D.set_deferred("disabled", true)
 
-func set_at_spawn(value) -> void:
-	at_spawn = value
+func set_at_spawn(bool_value, spawner: StaticBody2D = null) -> void:
+	if bool_value:
+		at_spawn = bool_value
+		spawn_area = spawner
+	else:
+		at_spawn = bool_value
+		spawn_area = null
 
 func set_at_table(bool_value, table : StaticBody2D = null) -> void:
 	if bool_value:
 		at_table = bool_value
 		table_area = table
-		print("set at table")
 	else:
 		at_table = bool_value
 		table_area = null
