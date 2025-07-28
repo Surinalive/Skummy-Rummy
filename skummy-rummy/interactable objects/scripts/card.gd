@@ -1,7 +1,6 @@
 extends Control
 
 #NOTE potential bug, button is drawn behind parent atm
-#TODO Use input events and input is pickkable!!
 
 # Note: A, 1, 2, 3, 4, 5, 6, 7, 8, 9, J, Q, K ->
 # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12.

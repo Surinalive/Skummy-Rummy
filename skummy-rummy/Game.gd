@@ -13,7 +13,7 @@ func _process(_delta: float) -> void:
 	pass
 
 # NOTE, need to add powerup cards functionality
-# Generates our card deck!
+## Generates our card deck!
 func generate_deck() -> void:
 	for i in 4:
 		for j in 13:
@@ -23,7 +23,7 @@ func generate_deck() -> void:
 			card.set_rank(j + 1)
 			deck_cards.append(card)
 
-# Deals out and returns a "hand" of 7 cards
+## Deals out and returns a "hand" of 7 cards
 func deal() -> Array:
 	var hand = []
 	for i in 7:
@@ -38,7 +38,7 @@ func draw() -> Node:
 	var card = deck_cards.pick_random()
 	return card
 
-# TODO: fix logic later. adds card back to deck...
+# TODO: TEST THIS
 # Replaces drawn card ^^ with card player selected to trade
 func trade(drawn_card, player_card) -> void:
 	deck_cards.append(player_card)

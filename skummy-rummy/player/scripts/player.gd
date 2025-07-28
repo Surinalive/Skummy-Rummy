@@ -92,7 +92,7 @@ func remove_from_hand(card) -> void:
 	#position += velocity * delta
 	#position = position.clamp(Vector2.ZERO, screen_size)
 
-## NOTE 
+# NOTE 
 ##func _on_body_entered(_body):
 	##hide() # Player disappears after being hit.
 	##hit.emit()

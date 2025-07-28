@@ -48,6 +48,7 @@ func cards_clickable() -> void:
 	get_tree().call_group("cards", "set_clickable")
 
 ## Disallows cards in hand to be selected
+#TODO need to fix logic.... error
 func cards_unclickable() -> void:
 	get_tree().call_group("cards", "set_unclickable")
 	get_tree().call_group("cards", "unpress_button")
@@ -59,8 +60,11 @@ func card_selected(card) -> void:
 	if player.at_table:
 		selected_cards.append(card)
 
+#TODO quick fix for error....
 func card_unselected(card) -> void:
-	selected_cards.remove_at(selected_cards.find(card))
+	var selected_card = selected_cards.find(card)
+	if (selected_card > -1):
+		selected_cards.remove_at(selected_card)
 
 # When player selects a card in hand, others are unselected 
 #TODO can probably clean this up / refactor
@@ -92,10 +96,8 @@ func at_spawn_select() -> void:
 	var drawn_card = get_drawn_card()
 	# remove drawn card from deck and add selected card to deck
 	player.trade(drawn_card, selected_card)
-	# remove selected card from player interface
-	$PlayerHand.remove_child(selected_card)
-	# remove selected card from player hand
-	player.remove_from_hand(selected_card)
+	# remove selected card from player interface & player hand
+	remove_from_hand(selected_card)
 	selected_cards = []
 	
 	#remove drawn card from player interface and add to player hand
