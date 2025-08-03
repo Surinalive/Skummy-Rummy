@@ -1,3 +1,4 @@
+class_name Player
 extends CharacterBody2D
 
 @export var speed = 300.0 # how fast the player will move (pixels/sec)
@@ -6,7 +7,7 @@ var movable = true
 var screen_size #size of game window
 @export var at_spawn = false
 @export var at_table = false
-@onready var game = $".."
+@onready var game
 
 @onready var table_area : StaticBody2D
 @onready var spawn_area : StaticBody2D
@@ -14,14 +15,16 @@ var screen_size #size of game window
 signal hit # TODO NOTE adding this because I'm following the tutorial a bit Might be 
 #useful with powerups and multiplayer
 
-# TODO CAn we clean this up later???
-func get_input():
-	var input_direction = Input.get_vector("left", "right", "up", "down")
-	velocity = input_direction * speed
-
+func _enter_tree() -> void:
+	set_multiplayer_authority(int(str(name)))
+	
 func _physics_process(_delta):
+	if !is_multiplayer_authority():
+		return
+		
 	if movable:
-		get_input()
+		var input_direction = Input.get_vector("left", "right", "up", "down")
+		velocity = input_direction * speed
 		move_and_slide()
 
 # used to check for single events....
@@ -35,11 +38,9 @@ func _input(event):
 				$PlayerInterface.display_drawn_card(spawn_area.draw_card())
 
 
-	
-
 #? As soon as spawned in, get dealt and display hand in player_interface
 func _ready() -> void:
-	hide() #hides the player when the game starts
+	#hide() #hides the player when the game starts
 	screen_size = get_viewport_rect().size
 	
 	
@@ -49,7 +50,7 @@ func start(pos):
 	hand = game.deal()
 	$PlayerInterface.display_hand(hand)
 	$CollisionShape2D.disabled = false
-	show()
+	#show()
 
 ## Allow player movement
 func set_movable(value):
@@ -57,6 +58,9 @@ func set_movable(value):
 	if (value):
 		at_spawn = false
 		at_table = false
+
+func set_game(game_path: Node) -> void:
+	game = game_path
 
 ## Return the player's current hand
 func get_hand() -> Array:

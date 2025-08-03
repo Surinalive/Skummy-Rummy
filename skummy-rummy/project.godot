@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="Skummy Rummy"
-run/main_scene="uid://ctlvoxkbt3icw"
+run/main_scene="uid://dvt76fk8vkj4d"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://art/icon.svg"
+
+[autoload]
+
+SceneManager="*res://game/scenes/SceneManager.tscn"
 
 [display]
 
