@@ -2,13 +2,14 @@ class_name Player
 extends CharacterBody2D
 
 @export var speed = 300.0 # how fast the player will move (pixels/sec)
-var hand = []
+var card_data_hand : Array[Dictionary] = []
 var movable = true
 var screen_size #size of game window
+
 @export var at_spawn = false
 @export var at_table = false
-@onready var game
-
+@onready var game : Game
+@onready var camera = $Camera2D as Camera2D
 @onready var table_area : StaticBody2D
 @onready var spawn_area : StaticBody2D
 
@@ -17,7 +18,17 @@ signal hit # TODO NOTE adding this because I'm following the tutorial a bit Migh
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(int(str(name)))
+
+#? As soon as spawned in, get dealt and display hand in player_interface
+func _ready() -> void:
+	#hide() #hides the player when the game starts
+	Server.hands_synchronized.connect(_on_hands_synchronized)
+	screen_size = get_viewport_rect().size
+	if is_multiplayer_authority(): camera.make_current()
 	
+	$CollisionShape2D.disabled = false   
+
+
 func _physics_process(_delta):
 	if !is_multiplayer_authority():
 		return
@@ -29,7 +40,11 @@ func _physics_process(_delta):
 
 # used to check for single events....
 func _input(event):
+	if !is_multiplayer_authority():
+		return
+	
 	if event.is_action_pressed("action"):
+		print("ACTION pressed. Calling cards_clickable().")
 		if (at_table || at_spawn):
 			set_movable(false)
 			$PlayerInterface.cards_clickable()
@@ -37,19 +52,19 @@ func _input(event):
 			if at_spawn:
 				$PlayerInterface.display_drawn_card(spawn_area.draw_card())
 
+func _on_hands_synchronized():
+	# This function is now guaranteed to run AFTER the hands have been updated.
+	var my_id = multiplayer.get_unique_id()
+	
+	if Server.player_hands.has(my_id):
+		card_data_hand = Server.player_hands[my_id]
+	
+	## Now, it is safe to display the hand.
+	#$PlayerInterface.display_hand(card_data_hand)
 
-#? As soon as spawned in, get dealt and display hand in player_interface
-func _ready() -> void:
-	#hide() #hides the player when the game starts
-	screen_size = get_viewport_rect().size
-	
-	
 # NOTE TODO Sets the players position at the start of the game...
 func start(pos):
 	position = pos
-	hand = game.deal()
-	$PlayerInterface.display_hand(hand)
-	$CollisionShape2D.disabled = false
 	#show()
 
 ## Allow player movement
@@ -59,20 +74,15 @@ func set_movable(value):
 		at_spawn = false
 		at_table = false
 
-func set_game(game_path: Node) -> void:
-	game = game_path
-
 ## Return the player's current hand
-func get_hand() -> Array:
-	return hand
+func get_hand() -> Array[Dictionary]:
+	return card_data_hand
 
-## Add card to player's hand
-func add_to_hand(card) -> void:
-	hand.append(card)
+## Remove card to player's hand
+func remove_from_hand(card_data : Dictionary) -> void:
+	#Server.remove_from_player_hand.rpc(card_data)
+	Server.rpc_id(1, "remove_from_player_hand", card_data)
 
-## Remove card from player's hand
-func remove_from_hand(card) -> void:
-	hand.erase(card)
 
 # NOTE
 # Got this from the tutorial... Wonder if it will be better for when we have 
@@ -121,10 +131,10 @@ func set_at_table(bool_value, table : StaticBody2D = null) -> void:
 		at_table = bool_value
 		table_area = null
 
-func trade(drawn_card, selected_card):
-	game.trade(drawn_card, selected_card)
+func trade(drawn_card : Dictionary, selected_card : Dictionary):
+	Server.rpc_id(1, "trade", drawn_card, selected_card)
 
-func attempt_meld(cards) -> bool:
+func attempt_meld(cards : Array[Card]) -> bool:
 	set_movable(true)
 	if (table_area.attempt_meld(cards)):
 		return true

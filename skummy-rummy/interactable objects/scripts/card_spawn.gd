@@ -1,3 +1,4 @@
+class_name CardSpawner
 extends StaticBody2D
 @onready var game = $".."
 
@@ -11,11 +12,11 @@ func _process(_delta: float) -> void:
 
 # TODO need to implement some type of timer to make sure player can't 
 # continuously draw.....
-func draw_card() -> Control:
-	return game.draw()
+func draw_card() -> Dictionary:
+	return Server.draw()
 
-func _on_area_2d_body_entered(body: Node2D) -> void:
+func _on_area_2d_body_entered(body: Player) -> void:
 	body.set_at_spawn(true, self)
 	
-func _on_area_2d_body_exited(body: Node2D) -> void:
+func _on_area_2d_body_exited(body: Player) -> void:
 	body.set_at_spawn(false)

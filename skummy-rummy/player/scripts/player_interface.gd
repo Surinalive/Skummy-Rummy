@@ -1,8 +1,14 @@
+class_name PlayerInterface
 extends CanvasLayer
 
-@onready var selected_cards = []
-@onready var player = $".."
+const CARD_SCENE_PATH = "res://interactable objects/scenes/card.tscn"
 
+@onready var selected_cards : Array[Card]= []
+@onready var player : Player = get_parent()
+@onready var player_cards : Array[Card]= []
+@export var player_hand : HBoxContainer
+
+#TODO gettin rid of groups for now...
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -11,47 +17,68 @@ func _ready() -> void:
 func buttons_visible(value) -> void:
 	$SelectButton.visible = value
 	$RejectButton.visible = value
+
+func get_card_data(card : Card) -> Dictionary:
+	var card_data = {
+				"deck_id" : card.get_id(),
+				"suit" : card.get_suit(),
+				"rank" : card.get_rank()
+			}
 	
-## Display cards dealt
-func display_hand(hand) -> void:
-	for card in hand:
-		$PlayerHand.add_child(card)
-		card.add_to_group("cards")
-		card.connect("card_selected", card_selected)
-		card.connect("card_unselected", card_unselected)
+	return card_data
 
-## Add a card to the player's hand
-func add_to_hand(card) -> void:
-	player.add_to_hand(card)
-	$PlayerHand.add_child(card)
-	card.add_to_group("cards")
-	#connect signals
-	card.connect("card_selected", card_selected)
-	card.connect("card_unselected", card_unselected)
-
-## Remove a card from player"s hand
-func remove_from_hand(card) -> void:
-	card.remove_from_group("cards")
-	# remove card from player interface
-	$PlayerHand.remove_child(card)
-	# remove selected card from player hand
-	player.remove_from_hand(card)
+### Display cards dealt
+#func display_hand(hand : Array = player.card_data_hand) -> void:
+	#remove_displayed_cards()
+	#for card_data in hand:
+		#var card_scene = preload(CARD_SCENE_PATH)
+		#var card = card_scene.instantiate()
+		#card.set_id(card_data["deck_id"])
+		#card.set_suit(card_data["suit"])
+		#card.set_rank(card_data["rank"])
+		#player_cards.append(card)
+		#$PlayerHand.add_child(card)
+		#card.connect("card_selected", card_selected)
+		#card.connect("card_unselected", card_unselected)
 
 ## Display the drawn card for the player
-func display_drawn_card(card) -> void:
+func display_drawn_card(card_data : Dictionary) -> void:
+	var card_scene = preload(CARD_SCENE_PATH)
+	var card = card_scene.instantiate()
+	card.set_suit(card_data["suit"])
+	card.set_rank(card_data["rank"])
+	
 	$DrawnCard.add_child(card)
 	cards_clickable()
 	buttons_visible(true)
 
 ## Allows cards in hand to be selected
 func cards_clickable() -> void:
-	get_tree().call_group("cards", "set_clickable")
+	#print(player_cards)
+	#for card in player_cards:
+		#card.set_clickable()
+	
+	# Add these lines to your function
+	print("CLIENT: Player cards array size: ", player_cards.size())
+	print("CLIENT: Player cards array contents: ", player_cards)
+	
+	#for card in player_cards:
+	for i in range(player_cards.size()):
+		var card = player_cards[i]
+		# Also, check if the node is valid
+		if is_instance_valid(card):
+			print("CLIENT: Card ", i, " is valid. Calling set_clickable().")
+			card.set_clickable()
+		else:
+			print("CLIENT: Card ", i, " is NOT valid. This is the source of the problem.")
 
 ## Disallows cards in hand to be selected
 #TODO need to fix logic.... error
 func cards_unclickable() -> void:
-	get_tree().call_group("cards", "set_unclickable")
-	get_tree().call_group("cards", "unpress_button")
+	for card in player_cards:
+		card.set_unclickable()
+		card.unpress_button()
+
 
 func card_selected(card) -> void:
 	if player.at_spawn:
@@ -60,7 +87,7 @@ func card_selected(card) -> void:
 	if player.at_table:
 		selected_cards.append(card)
 
-#TODO quick fix for error....
+#TODO quick fix for error....error with multiplayer
 func card_unselected(card) -> void:
 	var selected_card = selected_cards.find(card)
 	if (selected_card > -1):
@@ -86,6 +113,11 @@ func _on_select_button_pressed() -> void:
 # on select button helper
 func at_spawn_select() -> void:
 	var selected_card
+	
+	if selected_cards.size() < 1:
+		print("A card must be selected!")
+		return
+	
 	# Double checking only one card is selected
 	if selected_cards.size() > 1:
 		print("More than one card is selected at the moment")
@@ -93,28 +125,28 @@ func at_spawn_select() -> void:
 	else:
 		selected_card = selected_cards.get(0)
 	
-	var drawn_card = get_drawn_card()
+	var drawn_card : Card = get_drawn_card()
+	
 	# remove drawn card from deck and add selected card to deck
-	player.trade(drawn_card, selected_card)
+	player.trade(get_card_data(drawn_card), get_card_data(selected_card))
 	# remove selected card from player interface & player hand
-	remove_from_hand(selected_card)
 	selected_cards = []
 	
 	#remove drawn card from player interface and add to player hand
 	$DrawnCard.remove_child(drawn_card)
-	add_to_hand(drawn_card)
 	
 	player.set_movable(true)
 	cards_unclickable()
 	buttons_visible(false)
 
+#TODO
 #on select button helper
 func at_table_select() -> void:
 	#Was attempted meld successful?
 	if (player.attempt_meld(selected_cards)):
 	#Remove cards from player hand and player interface
 		for card in selected_cards:
-			remove_from_hand(card)
+			player.remove_from_hand(get_card_data(card))
 	selected_cards = []
 	cards_unclickable()
 	buttons_visible(false)
@@ -125,6 +157,7 @@ func _on_reject_button_pressed() -> void:
 	$DrawnCard.remove_child(get_drawn_card())
 	player.set_movable(true)
 	cards_unclickable()
+	buttons_visible(false)
 	
 ## Retrieve drawn card
 func get_drawn_card() -> Node:
@@ -139,3 +172,8 @@ func get_selected_card() -> Node:
 			if card.is_selected():
 				return card
 	return null
+
+func remove_displayed_cards() -> void:
+	for card in $PlayerHand.get_children(false):
+		if card != $PlayerHand/ReferenceRect:
+			$PlayerHand.remove_child(card)

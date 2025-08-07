@@ -1,9 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://nka73l6maj5k"]
 
-[ext_resource type="Script" uid="uid://bk4x2lk13tu0e" path="res://game/scripts/lobby.gd" id="1_rd4vf"]
+[ext_resource type="Script" uid="uid://bk4x2lk13tu0e" path="res://game/scripts/Lobby.gd" id="1_rd4vf"]
 [ext_resource type="PackedScene" uid="uid://c7o8l8wrssvkv" path="res://player/scenes/player_card.tscn" id="2_18aao"]
 
-[node name="Lobby" type="Control" node_paths=PackedStringArray("host_controls", "player_cards")]
+[node name="Lobby" type="Control" node_paths=PackedStringArray("host_controls", "player_cards", "player_spawner")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,6 +14,17 @@ script = ExtResource("1_rd4vf")
 host_controls = [NodePath("Centered/Controls/Start")]
 player_card = ExtResource("2_18aao")
 player_cards = NodePath("Centered/PlayerCards")
+player_spawner = NodePath("Centered/PlayerCards/MultiplayerSpawner")
+next_scene = "uid://c2meeupr7kifc"
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.635294, 0.501961, 1, 1)
 
 [node name="TitleMargin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -70,6 +81,5 @@ text = "Start"
 layout_mode = 2
 text = "Quit Game"
 
-[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="Centered/Controls/Start" to="." method="_on_start_pressed"]
 [connection signal="pressed" from="Centered/Controls/Quit" to="." method="_on_quit_pressed"]

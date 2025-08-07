@@ -1,12 +1,9 @@
-extends Node2D
+extends Control
 
-
-
-func _on_host_pressed() -> void:
-	Lobby.create_game()
-	get_tree().change_scene_to_file("res://game/scenes/Game.tscn")
-
+func _on_host_enet_pressed() -> void:
+	Server.create_game()
+	get_tree().change_scene_to_file("res://game/scenes/Lobby.tscn")
 
 func _on_join_pressed() -> void:
-	Lobby.join_game()
-	#get_tree().change_scene_to_file("res://game/scenes/Game.tscn")
+	Server.join_game()
+	get_tree().change_scene_to_file("res://game/scenes/Lobby.tscn")

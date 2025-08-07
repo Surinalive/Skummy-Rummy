@@ -1,3 +1,4 @@
+class_name Card
 extends Control
 
 #NOTE potential bug, button is drawn behind parent atm
@@ -5,11 +6,18 @@ extends Control
 # Note: A, 1, 2, 3, 4, 5, 6, 7, 8, 9, J, Q, K ->
 # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12.
 # Club, Diamond, Heart, Spade -> 1, 2, 3, 4
+@onready var card_id: int
 @onready var card_rank: int
 @onready var card_suit: int
 @onready var selected = false
 signal card_selected(card)
 signal card_unselected(card)
+
+func set_id(id: int) -> void:
+	card_id = id
+	
+func get_id() -> int:
+	return card_id
 
 func set_rank(rank: int) -> void:
 	card_rank = rank
@@ -39,7 +47,9 @@ func get_suit() -> int:
 	return card_suit;
 
 func set_clickable() -> void:
+	print(" in card")
 	$Button.disabled = false
+	print($Button.disabled)
 
 func set_unclickable() -> void:
 	$Button.disabled = true

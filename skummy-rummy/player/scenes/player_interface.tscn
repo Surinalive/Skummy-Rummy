@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://bv8m08cp11fp2" path="res://player/scripts/player_interface.gd" id="1_dyfmo"]
 
-[node name="PlayerInterface" type="CanvasLayer"]
+[node name="PlayerInterface" type="CanvasLayer" node_paths=PackedStringArray("player_hand")]
 script = ExtResource("1_dyfmo")
+player_hand = NodePath("PlayerHand")
 
 [node name="PlayerHand" type="HBoxContainer" parent="."]
 offset_left = 63.0
@@ -24,6 +25,7 @@ offset_right = 580.0
 offset_bottom = 445.0
 
 [node name="ReferenceRect" type="ReferenceRect" parent="DrawnCard"]
+visible = false
 layout_mode = 2
 border_width = 5.0
 
