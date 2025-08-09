@@ -2,7 +2,7 @@ extends Node
 
 @onready var deck_cards = []
 const CARD_SCENE_PATH: String = "res://interactable objects/scenes/card.tscn"
-
+#TODO Game need to connect signals from every player ("area entered") to tables and spawns
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	generate_deck()
@@ -13,7 +13,7 @@ func _process(_delta: float) -> void:
 	pass
 
 # NOTE, need to add powerup cards functionality
-# Generates our card deck!
+## Generates our card deck!
 func generate_deck() -> void:
 	for i in 4:
 		for j in 13:
@@ -23,7 +23,7 @@ func generate_deck() -> void:
 			card.set_rank(j + 1)
 			deck_cards.append(card)
 
-# Deals out and returns a "hand" of 7 cards
+## Deals out and returns a "hand" of 7 cards
 func deal() -> Array:
 	var hand = []
 	for i in 7:
@@ -38,7 +38,7 @@ func draw() -> Node:
 	var card = deck_cards.pick_random()
 	return card
 
-# TODO: fix logic later. adds card back to deck...
+# TODO: TEST THIS
 # Replaces drawn card ^^ with card player selected to trade
 func trade(drawn_card, player_card) -> void:
 	deck_cards.append(player_card)
@@ -56,38 +56,8 @@ func new_game():
 func _on_start_timer_timeout() -> void:
 	pass # Replace with function body.
 	
-	
-func place_meld(cards : Array) -> void:
-	$Table.place_meld(cards)
-	
-# checking if the hand contains a valid meld
-func meld_check(cards : Array) -> bool:
-	return check_run(cards) or check_set(cards)
 
-# TODO test!!!
-func check_run(cards : Array) -> bool:
-	var ranks = []
-	var suit = cards[0].get_suit()
-	
-	for card in cards:
-		if card.get_suit() != suit:
-			return false
-		ranks.append(card.get_rank())
-	
-	ranks.sort()
-	
-	for i in ranks.size() - 2:
-		if (ranks[i] != ranks[i + 1] - 1):
-			return false
-	
-	return true
-
-# TODO test!!!
-func check_set(cards : Array) -> bool:
-	var rank = cards[0].get_rank()
-	
-	for card in cards:
-		if card.get_rank() != rank:
-			return false
-			
-	return true
+#var node = Node3D.new()
+	#node.call("rotate", Vector3(1.0, 0.0, 0.0), 1.571)
+	## Option 3: Signal.connect() with an implicit Callable for the defined function.
+	#button.button_down.connect(_on_button_down)
