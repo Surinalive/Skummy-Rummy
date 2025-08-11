@@ -28,18 +28,18 @@ func get_card_data(card : Card) -> Dictionary:
 	return card_data
 
 ### Display cards dealt
-#func display_hand(hand : Array = player.card_data_hand) -> void:
-	#remove_displayed_cards()
-	#for card_data in hand:
-		#var card_scene = preload(CARD_SCENE_PATH)
-		#var card = card_scene.instantiate()
-		#card.set_id(card_data["deck_id"])
-		#card.set_suit(card_data["suit"])
-		#card.set_rank(card_data["rank"])
-		#player_cards.append(card)
-		#$PlayerHand.add_child(card)
-		#card.connect("card_selected", card_selected)
-		#card.connect("card_unselected", card_unselected)
+func display_hand(hand : Array = player.card_data_hand) -> void:
+	remove_displayed_cards()
+	for card_data in hand:
+		var card_scene = preload(CARD_SCENE_PATH)
+		var card = card_scene.instantiate()
+		card.set_id(card_data["deck_id"])
+		card.set_suit(card_data["suit"])
+		card.set_rank(card_data["rank"])
+		player_cards.append(card)
+		$PlayerHand.add_child(card)
+		card.connect("card_selected", card_selected)
+		card.connect("card_unselected", card_unselected)
 
 ## Display the drawn card for the player
 func display_drawn_card(card_data : Dictionary) -> void:
@@ -54,23 +54,8 @@ func display_drawn_card(card_data : Dictionary) -> void:
 
 ## Allows cards in hand to be selected
 func cards_clickable() -> void:
-	#print(player_cards)
-	#for card in player_cards:
-		#card.set_clickable()
-	
-	# Add these lines to your function
-	print("CLIENT: Player cards array size: ", player_cards.size())
-	print("CLIENT: Player cards array contents: ", player_cards)
-	
-	#for card in player_cards:
-	for i in range(player_cards.size()):
-		var card = player_cards[i]
-		# Also, check if the node is valid
-		if is_instance_valid(card):
-			print("CLIENT: Card ", i, " is valid. Calling set_clickable().")
-			card.set_clickable()
-		else:
-			print("CLIENT: Card ", i, " is NOT valid. This is the source of the problem.")
+	for card in player_cards:
+		card.set_clickable()
 
 ## Disallows cards in hand to be selected
 #TODO need to fix logic.... error

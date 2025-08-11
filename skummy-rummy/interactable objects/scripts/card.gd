@@ -47,9 +47,7 @@ func get_suit() -> int:
 	return card_suit;
 
 func set_clickable() -> void:
-	print(" in card")
 	$Button.disabled = false
-	print($Button.disabled)
 
 func set_unclickable() -> void:
 	$Button.disabled = true

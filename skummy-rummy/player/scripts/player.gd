@@ -13,7 +13,7 @@ var screen_size #size of game window
 @onready var table_area : StaticBody2D
 @onready var spawn_area : StaticBody2D
 
-signal hit # TODO NOTE adding this because I'm following the tutorial a bit Might be 
+#signal hit # TODO NOTE adding this because I'm following the tutorial a bit Might be 
 #useful with powerups and multiplayer
 
 func _enter_tree() -> void:
@@ -24,10 +24,21 @@ func _ready() -> void:
 	#hide() #hides the player when the game starts
 	Server.hands_synchronized.connect(_on_hands_synchronized)
 	screen_size = get_viewport_rect().size
-	if is_multiplayer_authority(): camera.make_current()
+	if is_multiplayer_authority(): 
+		camera.make_current()
 	
 	$CollisionShape2D.disabled = false   
 
+	var my_id = multiplayer.get_unique_id()
+	
+	if Server.player_hands.has(my_id):
+		card_data_hand = Server.player_hands[my_id]
+	
+	## Now, it is safe to display the hand.
+	if is_multiplayer_authority():
+		$PlayerInterface.display_hand(card_data_hand)
+
+#TODO can set processing to off to stop movement??
 
 func _physics_process(_delta):
 	if !is_multiplayer_authority():
@@ -44,7 +55,6 @@ func _input(event):
 		return
 	
 	if event.is_action_pressed("action"):
-		print("ACTION pressed. Calling cards_clickable().")
 		if (at_table || at_spawn):
 			set_movable(false)
 			$PlayerInterface.cards_clickable()
@@ -53,14 +63,15 @@ func _input(event):
 				$PlayerInterface.display_drawn_card(spawn_area.draw_card())
 
 func _on_hands_synchronized():
-	# This function is now guaranteed to run AFTER the hands have been updated.
+	print("hands synced")
+
 	var my_id = multiplayer.get_unique_id()
 	
 	if Server.player_hands.has(my_id):
 		card_data_hand = Server.player_hands[my_id]
 	
-	## Now, it is safe to display the hand.
-	#$PlayerInterface.display_hand(card_data_hand)
+	print(card_data_hand)
+	$PlayerInterface.display_hand(card_data_hand)
 
 # NOTE TODO Sets the players position at the start of the game...
 func start(pos):
@@ -81,7 +92,10 @@ func get_hand() -> Array[Dictionary]:
 ## Remove card to player's hand
 func remove_from_hand(card_data : Dictionary) -> void:
 	#Server.remove_from_player_hand.rpc(card_data)
-	Server.rpc_id(1, "remove_from_player_hand", card_data)
+	if multiplayer.is_server():
+		Server.server_remove_from_player_hand(card_data)
+	else:
+		Server.rpc_id(1, "remove_from_player_hand", card_data)#TODO
 
 
 # NOTE
@@ -132,10 +146,17 @@ func set_at_table(bool_value, table : StaticBody2D = null) -> void:
 		table_area = null
 
 func trade(drawn_card : Dictionary, selected_card : Dictionary):
-	Server.rpc_id(1, "trade", drawn_card, selected_card)
+	#Server.rpc_id(1, "trade", drawn_card, selected_card)
+	if multiplayer.is_server():
+		Server.server_trade(drawn_card, selected_card)
+	else:
+		Server.rpc_id(1, "trade", drawn_card, selected_card)
 
 func attempt_meld(cards : Array[Card]) -> bool:
 	set_movable(true)
 	if (table_area.attempt_meld(cards)):
 		return true
 	return false
+
+func hide_interface() -> void:
+	$PlayerInterface.visible = false

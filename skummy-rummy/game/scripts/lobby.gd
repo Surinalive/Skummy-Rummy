@@ -47,7 +47,7 @@ func spawn_player_card(authority_pid: int) -> void:
 	client_pc.name = str(authority_pid)
 	player_cards.add_child(client_pc)
 
-func _ms_player(authority_pid: int) -> PackedScene:
+func _ms_player(_authority_pid: int) -> PackedScene:
 	# This function is used by the MultiplayerSpawner. 
 	# It must return a PackedScene, not an instance.
 	# The MultiplayerSpawner handles the instantiation and syncing.

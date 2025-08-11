@@ -4,13 +4,10 @@ extends Node2D
 @export var player_scene: PackedScene
 @export var player_spawner: MultiplayerSpawner
 
-signal player_spawned(player_node)
-
 func _ready() -> void:
 	player_spawner.spawn_function = _ms_player
 	
 	if multiplayer.is_server():
-		Server.set_world()
 		# The server is responsible for spawning all players.
 		_spawn_all_players_on_server()
 
@@ -35,6 +32,8 @@ func _ms_player(authority_pid: int) -> Player:
 		player.start($P1StartPosition.position)
 	else:
 		player.start($P2StartPosition.position)
-	
-	player_spawned.emit(player)
+
+	if authority_pid != multiplayer.get_unique_id():
+		player.hide_interface()
 	return player
+	
