@@ -1,13 +1,14 @@
 class_name ENetConnectionManager
 extends PanelContainer
 
-signal server_created
-signal server_joined
-
 @export var host_ip: LineEdit
 @export var host_port: LineEdit
 
 var peer = ENetMultiplayerPeer.new()
+
+signal server_created
+signal server_joined
+
 
 func _on_host_enet_pressed() -> void:
 	peer.create_server(int(host_port.text))

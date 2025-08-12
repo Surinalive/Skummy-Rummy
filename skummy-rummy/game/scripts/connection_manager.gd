@@ -1,12 +1,13 @@
 class_name ConnectionManager
 extends Control
 
+@export var enet: ENetConnectionManager
+
 signal hosting
 signal joining
 
-@export var enet: ENetConnectionManager
 
-#I'll fix up and change labels later
+# TODO I'll fix up and change labels later
 func _ready() -> void:
 	enet.server_created.connect(_host_handler)
 	enet.server_joined.connect(_join_handler)

@@ -8,15 +8,10 @@ player_hand = NodePath("PlayerHand")
 
 [node name="PlayerHand" type="HBoxContainer" parent="."]
 offset_left = 63.0
-offset_top = 449.0
+offset_top = 512.0
 offset_right = 1089.0
 offset_bottom = 648.0
-
-[node name="ReferenceRect" type="ReferenceRect" parent="PlayerHand"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-border_width = 5.0
+theme_override_constants/separation = 0
 
 [node name="DrawnCard" type="MarginContainer" parent="."]
 offset_left = 450.0
@@ -24,12 +19,8 @@ offset_top = 246.0
 offset_right = 580.0
 offset_bottom = 445.0
 
-[node name="ReferenceRect" type="ReferenceRect" parent="DrawnCard"]
-visible = false
-layout_mode = 2
-border_width = 5.0
-
 [node name="SelectButton" type="Button" parent="."]
+visible = false
 offset_left = 1089.0
 offset_top = 449.0
 offset_right = 1152.0
@@ -37,11 +28,29 @@ offset_bottom = 512.0
 text = "Select"
 
 [node name="RejectButton" type="Button" parent="."]
+visible = false
 offset_left = 1089.0
 offset_top = 578.0
 offset_right = 1152.0
 offset_bottom = 641.0
 text = "Reject"
+
+[node name="ReferenceRect" type="ReferenceRect" parent="."]
+visible = false
+offset_left = 63.0
+offset_top = 512.0
+offset_right = 1089.0
+offset_bottom = 648.0
+size_flags_horizontal = 3
+border_width = 5.0
+
+[node name="ReferenceRect2" type="ReferenceRect" parent="."]
+visible = false
+offset_left = 450.0
+offset_top = 246.0
+offset_right = 580.0
+offset_bottom = 445.0
+border_width = 5.0
 
 [connection signal="pressed" from="SelectButton" to="." method="_on_select_button_pressed"]
 [connection signal="pressed" from="RejectButton" to="." method="_on_reject_button_pressed"]

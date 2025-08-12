@@ -10,21 +10,18 @@ extends Control
 @onready var card_rank: int
 @onready var card_suit: int
 @onready var selected = false
+
 signal card_selected(card)
 signal card_unselected(card)
 
+### SETTERS
+
 func set_id(id: int) -> void:
 	card_id = id
-	
-func get_id() -> int:
-	return card_id
 
 func set_rank(rank: int) -> void:
 	card_rank = rank
 	$ColorRect/rank.text = str(rank)
-
-func get_rank() -> int:
-	return card_rank
 
 func set_suit(suit: int) -> void:
 	card_suit = suit
@@ -42,9 +39,6 @@ func set_suit(suit: int) -> void:
 	
 	$ColorRect/suit_top.text = text
 	$ColorRect/suit_bottom.text = text
-	
-func get_suit() -> int:
-	return card_suit;
 
 func set_clickable() -> void:
 	$Button.disabled = false
@@ -52,16 +46,22 @@ func set_clickable() -> void:
 func set_unclickable() -> void:
 	$Button.disabled = true
 	$ColorRect.color = Color(1, 1, 1, 1)
-	
-func is_selected() -> bool: 
-	return selected
 
-func unpress_button() -> void:
-	$Button.set_pressed(false)
-	selected = false
-	$ColorRect.color = Color(1, 1, 1, 1)
+### GETTERS
+
+func get_rank() -> int:
+	return card_rank
+
+func get_id() -> int:
+	return card_id
+
+func get_suit() -> int:
+	return card_suit;
+
+### SIGNAL LOGIC
 
 func _on_button_toggled(toggled_on: bool) -> void:
+
 	if toggled_on:
 		selected = true
 		$ColorRect.color = Color(0, 1, 1, 1)
@@ -70,3 +70,13 @@ func _on_button_toggled(toggled_on: bool) -> void:
 		selected = false
 		$ColorRect.color = Color(1, 1, 1, 1)
 		card_unselected.emit(self)
+
+### MISC
+
+func is_selected() -> bool: 
+	return selected
+
+func unpress_button() -> void:
+	$Button.set_pressed(false)
+	selected = false
+	$ColorRect.color = Color(1, 1, 1, 1)

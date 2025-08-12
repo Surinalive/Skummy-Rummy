@@ -515,3 +515,4 @@ position = Vector2(884, 316)
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="OnlineEntities"]
 _spawnable_scenes = PackedStringArray("uid://7t8nh7uq3y5o")
 spawn_path = NodePath("..")
+spawn_limit = 7

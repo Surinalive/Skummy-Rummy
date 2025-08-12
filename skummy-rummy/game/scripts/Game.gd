@@ -1,29 +1,18 @@
 class_name Game
 extends Node
-## logic for scene manager
-#signal loaded()
-
-signal hands_synchronized
-## server logic
-signal player_connected(peer_id, player_info)
-signal player_disconnected(peer_id)
-signal server_disconnected
 
 const CARD_SCENE_PATH: String = "res://interactable objects/scenes/card.tscn"
-
-## multiplayer logic
 const PORT = 7000 #I can choose my own port...
 const DEFAULT_SERVER_IP = "127.0.0.1" # IPv4 localhost
 const MAX_CONNECTIONS = 20
-
 const PLAYER : PackedScene = preload("res://player/scenes/player.tscn")
 
-var deck_cards = {}
 
 ## This will contain player info for every player,
 ## with the keys being each player's unique IDs.
 var players = {}
 
+#TODO
 ## This is the local player info. This should be modified locally
 ## before the connection is made. It will be passed to every other peer.
 ## For example, the value of "name" can be set to something the player
@@ -31,11 +20,15 @@ var players = {}
 var player_info = {"name": "Name"}
 
 var player_hands = {}
-
 var players_loaded = 0
+var deck_cards = {}
 
-#TODO Game need to connect signals from every player ("area entered") to tables and spawns
-# Called when the node enters the scene tree for the first time.
+#signal loaded() #logic for scene manager
+signal hands_synchronized
+signal player_connected(peer_id, player_info)
+signal player_disconnected(peer_id)
+signal server_disconnected
+
 
 ## logic for scene manager
 #func activate() -> void:
@@ -44,7 +37,7 @@ var players_loaded = 0
 	#await get_tree().create_timer(SceneManager.WAIT).timeout
 	#loaded.emit()
 
-
+# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	## multiplayer logic
 	multiplayer.peer_connected.connect(_on_player_connected)
@@ -53,22 +46,33 @@ func _ready() -> void:
 	multiplayer.connection_failed.connect(_on_connected_fail)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 
+### SERVER ONLY GAME LOGIC
+
+func start_game():
+	generate_deck()
+	deal_hands()
+
+
 # NOTE, need to add powerup cards functionality
 ## Generates our card deck!
 func generate_deck() -> void:
 	if not multiplayer.is_server():
 		return
 	var key = 0
-	for i in 4:
-		for j in 13:
-			var card_data = {
-				"deck_id" : key,
-				"suit" : i + 1,
-				"rank" : j + 1
-			}
-			deck_cards.set(key,card_data)
-			key += 1
+	for l in 2:
+		for i in 4:
+			for j in 13:
+				var card_data = {
+					"deck_id" : key,
+					"suit" : i + 1,
+					"rank" : j + 1
+				}
+				deck_cards.set(key,card_data)
+				key += 1
 	
+###TODO!!!
+#If there are only two players they each get 10 cards, 
+#if there are three or four player then each player gets 7 cards.
 ## Deals out all player hands
 func deal_hands() -> void:
 	# Only the server should deal the hands.
@@ -76,9 +80,16 @@ func deal_hands() -> void:
 	if not multiplayer.is_server():
 		return
 
+	var hand_size
+	
+	if players.size() <= 2:
+		hand_size = 10
+	else:
+		hand_size = 7
+	
 	for player in players:
 		var hand : Array[Dictionary]= []
-		for i in 7:
+		for i in hand_size:
 			var card_data = draw()
 			hand.append(card_data)
 
@@ -89,39 +100,10 @@ func deal_hands() -> void:
 	# After dealing, need to broadcast the new state to all clients.
 	rpc("sync_hands_with_clients", player_hands, deck_cards)
 
-# This function is on the server
-@rpc("unreliable", "call_local")
-func sync_hands_with_clients(new_player_hands, new_deck_cards):
-	# This function runs on all clients (and the server)
-	# Update the local hands dictionary
-	self.player_hands = new_player_hands
-	self.deck_cards = new_deck_cards
-	print("Peer ", multiplayer.get_unique_id(), " Received synchronized hands")
-	
-	hands_synchronized.emit()
-
-@rpc("unreliable", "authority")
-func get_player_hand() -> Array:
-	var id = get_multiplayer().get_remote_sender_id()
-	if player_hands.has(id):
-		return player_hands[id]
-	else:
-		print("error")
-		return []
-
-#TODO redo with multiplayer in mind
-# Draws a random card from the deck
-@rpc("unreliable", "authority")
-func draw() -> Dictionary:
-	var random_key = deck_cards.keys().pick_random()
-	var card = deck_cards.get(random_key)
-	return card
-
-# TODO: TEST THIS
-
 func server_trade(drawn_card_data : Dictionary, player_card_data : Dictionary) -> void:
+	
 	var player_id = multiplayer.get_unique_id()
-	print("hi")
+	
 	if !player_hands.has(player_id) or !player_hands[player_id].has(player_card_data):
 		print("Server: Invalid discard request. Player ", player_id, " does not have this card.")
 		return
@@ -144,8 +126,52 @@ func server_trade(drawn_card_data : Dictionary, player_card_data : Dictionary) -
 	# Server tells everyone that the hand has changed
 	rpc("sync_hands_with_clients", player_hands, deck_cards)
 
+func server_remove_from_player_hand(card_data) -> void:
+	
+	var player_id = multiplayer.get_unique_id()
+	
+	if !player_hands.has(player_id) or !player_hands[player_id].has(card_data):
+		print("Server: Invalid remove request. Player ", player_id, " does not have this card.")
+		return
+		
+	# Server removes card from its player's hand
+	player_hands[player_id].remove_at(player_hands[player_id].find(card_data))
+	print("Server: Player ", player_id, " traded a card.")
+	
+	# Server tells everyone that the hand has changed
+	rpc("sync_hands_with_clients", player_hands, deck_cards)
+
+### GAME LOGIC
+
+# This function runs on all clients (and the server)
+@rpc("reliable", "call_local")
+func sync_hands_with_clients(new_player_hands, new_deck_cards):
+	
+	# Update the local hands dictionary
+	self.player_hands = new_player_hands
+	self.deck_cards = new_deck_cards
+	print("Peer ", multiplayer.get_unique_id(), " Received synchronized hands")
+	
+	hands_synchronized.emit()
+
+@rpc("reliable", "authority")
+func get_player_hand() -> Array:
+	var id = get_multiplayer().get_remote_sender_id()
+	if player_hands.has(id):
+		return player_hands[id]
+	else:
+		print("error")
+		return []
+
+# Draws a random card from the deck
+@rpc("reliable", "authority")
+func draw() -> Dictionary:
+	var random_key = deck_cards.keys().pick_random()
+	var card = deck_cards.get(random_key)
+	return card
+
 # Replaces drawn card ^^ with card player selected to trade
-@rpc("unreliable", "any_peer")
+@rpc("reliable", "any_peer")
 func trade(drawn_card_data : Dictionary, player_card_data : Dictionary) -> void:
 	# Get ID of the peer who sent the rpc
 	var player_id = multiplayer.get_remote_sender_id()
@@ -172,23 +198,8 @@ func trade(drawn_card_data : Dictionary, player_card_data : Dictionary) -> void:
 	# Server tells everyone that the hand has changed
 	rpc("sync_hands_with_clients", player_hands, deck_cards)
 
-## Removes a card from player hand (used in table melds)
-func server_remove_from_player_hand(card_data) -> void:
-	# Get ID of the peer who sent the rpc
-	var player_id = multiplayer.get_unique_id()
-	
-	if !player_hands.has(player_id) or !player_hands[player_id].has(card_data):
-		print("Server: Invalid remove request. Player ", player_id, " does not have this card.")
-		return
-		
-	# Server removes card from players hand
-	player_hands[player_id].remove_at(player_hands[player_id].find(card_data))
-	print("Server: Player ", player_id, " traded a card.")
-	
-	# Server tells everyone that the hand has changed
-	rpc("sync_hands_with_clients", player_hands, deck_cards)
-
-@rpc("unreliable", "any_peer")
+# Removes a card from player hand (used in table melds)
+@rpc("reliable", "any_peer")
 func remove_from_player_hand(card_data) -> void:
 	# Get ID of the peer who sent the rpc
 	var player_id = multiplayer.get_remote_sender_id()
@@ -204,6 +215,7 @@ func remove_from_player_hand(card_data) -> void:
 	# Server tells everyone that the hand has changed
 	rpc("sync_hands_with_clients", player_hands, deck_cards)
 
+
 # NOTE tutorial has this named game_over()... NOt suitable to our purposes
 #func _on_player_hit() -> void:
 	#pass # Replace with function body.
@@ -216,20 +228,8 @@ func remove_from_player_hand(card_data) -> void:
 	#pass # Replace with function body.
 	#
 
-#TODO
-# Called only on the server.
-func start_game():
-	# All peers are ready to receive RPCs in this scene.
-	generate_deck()
-	deal_hands()
+### SERVER SETUP
 
-#var node = Node3D.new()
-	#node.call("rotate", Vector3(1.0, 0.0, 0.0), 1.571)
-	## Option 3: Signal.connect() with an implicit Callable for the defined function.
-	#button.button_down.connect(_on_button_down)
-
-
-## NOTE: Setting up of server
 ## create a server
 func create_game():
 	var peer = ENetMultiplayerPeer.new()
@@ -273,21 +273,13 @@ func player_loaded():
 	if multiplayer.is_server():
 		players_loaded += 1
 		if players_loaded == players.size():
+			start_game()
 			players_loaded = 0
 	
 ## When a peer connects, send them my player info.
 ## This allows transfer of all desired data for each player, not only the unique ID.
 func _on_player_connected(id):
 	_register_player.rpc_id(id, player_info)
-	
-	## Check if the game has already started and hands have been dealt.
-	#if !player_hands.is_empty():
-		#print("Server: Game is in progress, sending hand data to new peer.")
-		#
-		## We must use rpc_id() to send a targeted RPC to this new peer.
-		## Send the entire synchronized hands dictionary so the new player
-		## gets the full game state.
-		#rpc_id(id, "sync_hands_with_clients", player_hands)
 
 @rpc("any_peer", "reliable")
 func _register_player(new_player_info):
