@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://c7o8l8wrssvkv"]
+
+[ext_resource type="Texture2D" uid="uid://jqij3kroptlo" path="res://art/icon.svg" id="1_do0n4"]
+
+[node name="PlayerCards" type="VBoxContainer"]
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_do0n4")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "Player"
+horizontal_alignment = 1

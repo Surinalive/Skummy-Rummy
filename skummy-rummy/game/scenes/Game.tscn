@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvt76fk8vkj4d"]
+
+[ext_resource type="Script" uid="uid://cu3ibwvcbpq1d" path="res://game/scripts/Game.gd" id="1_o003k"]
+
+[node name="Game" type="Node"]
+script = ExtResource("1_o003k")
+
+[node name="StartTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]

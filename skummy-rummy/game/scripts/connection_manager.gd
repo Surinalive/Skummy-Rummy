@@ -1,0 +1,21 @@
+class_name ConnectionManager
+extends Control
+
+@export var enet: ENetConnectionManager
+
+signal hosting
+signal joining
+
+
+# TODO I'll fix up and change labels later
+func _ready() -> void:
+	enet.server_created.connect(_host_handler)
+	enet.server_joined.connect(_join_handler)
+
+func _host_handler() -> void:
+	hosting.emit()
+	hide()
+	
+func _join_handler() -> void:
+	joining.emit()
+	hide()

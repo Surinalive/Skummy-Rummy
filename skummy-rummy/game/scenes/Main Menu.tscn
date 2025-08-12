@@ -1,0 +1,70 @@
+[gd_scene load_steps=2 format=3 uid="uid://chehyqaqmy5id"]
+
+[ext_resource type="Script" uid="uid://btmv7hdadrq2u" path="res://game/scripts/main_menu.gd" id="1_xiutb"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xiutb")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.572549, 0.686275, 1, 1)
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -46.5
+offset_bottom = 46.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 250
+theme_override_constants/margin_right = 250
+
+[node name="ConnectionMethods" type="VBoxContainer" parent="MarginContainer2"]
+layout_mode = 2
+
+[node name="ENet" type="PanelContainer" parent="MarginContainer2/ConnectionMethods"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/ConnectionMethods/ENet"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer2/ConnectionMethods/ENet/VBoxContainer"]
+layout_mode = 2
+text = "Connect via Enet"
+
+[node name="JoinMenu" type="HBoxContainer" parent="MarginContainer2/ConnectionMethods/ENet/VBoxContainer"]
+layout_mode = 2
+
+[node name="HostIP" type="LineEdit" parent="MarginContainer2/ConnectionMethods/ENet/VBoxContainer/JoinMenu"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "127.0.0.1"
+
+[node name="HostPort" type="LineEdit" parent="MarginContainer2/ConnectionMethods/ENet/VBoxContainer/JoinMenu"]
+layout_mode = 2
+text = "7000"
+
+[node name="Join" type="Button" parent="MarginContainer2/ConnectionMethods/ENet/VBoxContainer/JoinMenu"]
+layout_mode = 2
+text = "Join"
+
+[node name="HostEnet" type="Button" parent="MarginContainer2/ConnectionMethods/ENet/VBoxContainer"]
+layout_mode = 2
+text = "Host via Enet"
+
+[connection signal="pressed" from="MarginContainer2/ConnectionMethods/ENet/VBoxContainer/JoinMenu/Join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="MarginContainer2/ConnectionMethods/ENet/VBoxContainer/HostEnet" to="." method="_on_host_enet_pressed"]
