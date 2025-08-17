@@ -149,3 +149,8 @@ func reset() -> void:
 	player.set_physics_process(true)
 	player.set_at_spawn(false)
 	player.set_at_table(false)
+
+
+func _on_melds_hit_check(player_id : int, meld: Array[Dictionary]) -> void:
+	player.hit(player_id, meld, selected_cards)
+	reset()

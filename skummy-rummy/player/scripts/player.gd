@@ -150,6 +150,14 @@ func attempt_meld(card_datas : Array[Dictionary]) -> void:
 	else:
 		Server.rpc_id(1, "attempt_player_meld", card_datas)
 
+func hit(player_id : int, meld : Array[Dictionary], selected_cards : Array[Dictionary]):
+	if multiplayer.is_server():
+		Server.server_hit(player_id, meld, selected_cards)
+	else:
+		Server.rpc_id(1, "player_hit", player_id, meld, selected_cards)
+	
+	meld_interface_visible(false)
+
 ### MISC
 func hide_interface() -> void:
 	$PlayerInterface.visible = false

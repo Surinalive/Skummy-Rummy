@@ -1,10 +1,82 @@
-[gd_scene load_steps=2 format=3 uid="uid://cpxmtvhgvgci4"]
+[gd_scene load_steps=4 format=3 uid="uid://cpxmtvhgvgci4"]
 
 [ext_resource type="Script" uid="uid://cxo2yq6nyul7d" path="res://interactable objects/scripts/meld_interface.gd" id="1_coo5d"]
+[ext_resource type="PackedScene" uid="uid://dedcs3l64js3x" path="res://interactable objects/scenes/meld_container.tscn" id="2_1gdbc"]
+[ext_resource type="Script" uid="uid://bdqh8eupg0h2x" path="res://interactable objects/scripts/meld_container.gd" id="3_r1uiv"]
 
 [node name="Melds" type="CanvasLayer"]
-visible = false
 script = ExtResource("1_coo5d")
+
+[node name="CardMarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -202.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MeldGrid" type="GridContainer" parent="CardMarginContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 3
+
+[node name="MeldContainer" parent="CardMarginContainer/MeldGrid" instance=ExtResource("2_1gdbc")]
+layout_mode = 2
+
+[node name="MeldContainer1" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_r1uiv")
+
+[node name="MeldContainer2" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_r1uiv")
+
+[node name="MeldContainer3" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_r1uiv")
+
+[node name="MeldContainer4" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_r1uiv")
+
+[node name="MeldContainer5" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_r1uiv")
+
+[node name="MeldContainer6" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_r1uiv")
+
+[node name="MeldContainer7" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_r1uiv")
+
+[node name="MeldContainer8" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_r1uiv")
+
+[node name="MeldContainer9" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_r1uiv")
 
 [node name="ButtonMarginContainer" type="MarginContainer" parent="."]
 offset_right = 1152.0
@@ -16,7 +88,12 @@ theme_override_constants/h_separation = 20
 theme_override_constants/v_separation = 20
 columns = 3
 
-[node name="Button" type="Button" parent="ButtonMarginContainer/ButtonGrid"]
+[node name="Button0" type="Button" parent="ButtonMarginContainer/ButtonGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Button1" type="Button" parent="ButtonMarginContainer/ButtonGrid"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -56,76 +133,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Button9" type="Button" parent="ButtonMarginContainer/ButtonGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="CardMarginContainer" type="MarginContainer" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_bottom = -202.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MeldGrid" type="GridContainer" parent="CardMarginContainer"]
-layout_mode = 2
-theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 20
-columns = 3
-
-[node name="HBoxContainer" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer3" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer4" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer5" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer6" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer7" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer8" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer9" type="HBoxContainer" parent="CardMarginContainer/MeldGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button" to="." method="_on_button_pressed"]
-[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button2" to="." method="_on_button_2_pressed"]
-[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button3" to="." method="_on_button_3_pressed"]
-[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button4" to="." method="_on_button_4_pressed"]
-[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button5" to="." method="_on_button_5_pressed"]
-[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button6" to="." method="_on_button_6_pressed"]
-[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button7" to="." method="_on_button_7_pressed"]
-[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button8" to="." method="_on_button_8_pressed"]
-[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button9" to="." method="_on_button_9_pressed"]
+[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button0" to="." method="_on_button_0_pressed"]
+[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button1" to="." method="_on_button_2_pressed"]
+[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button2" to="." method="_on_button_3_pressed"]
+[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button3" to="." method="_on_button_4_pressed"]
+[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button4" to="." method="_on_button_5_pressed"]
+[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button5" to="." method="_on_button_6_pressed"]
+[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button6" to="." method="_on_button_7_pressed"]
+[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button7" to="." method="_on_button_8_pressed"]
+[connection signal="pressed" from="ButtonMarginContainer/ButtonGrid/Button8" to="." method="_on_button_9_pressed"]

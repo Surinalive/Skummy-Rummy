@@ -54,6 +54,11 @@ func start_game():
 	generate_deck()
 	deal_hands()
 
+func _process(_delta) -> void:
+	for hand in player_hands.values():
+		if hand.size() == 0:
+			print(" A player won!! ")
+
 # NOTE, need to add powerup cards functionality
 ## Generates our card deck!
 func generate_deck() -> void:
@@ -162,7 +167,6 @@ func attempt_server_meld(card_datas : Array[Dictionary]) -> void:
 	else: 
 		print("Not a valid meld. Sets must be of same rank. Runs must be of same
 		suit and consecutive.")
-		server_meld_result(false, card_datas)
 		return
 
 func server_meld_result(success: bool, card_datas: Array[Dictionary]) -> void:
@@ -170,6 +174,26 @@ func server_meld_result(success: bool, card_datas: Array[Dictionary]) -> void:
 		for card_data in card_datas:
 			server_remove_from_player_hand(card_data)
 			print("Meld was successful: ", success)
+
+#update to account for possible cheating....
+func server_hit(id : int, meld : Array[Dictionary], selected_cards : Array[Dictionary]) -> void:
+	var player_id = multiplayer.get_unique_id()
+	
+	if !melds.has(player_id):
+		print("Only those who have placed a meld can hit!")
+		return
+	
+	meld.append_array(selected_cards)
+	
+	# double checking id and checking if valid meld
+	if meld_check(meld) && melds.has(id):
+		melds[id] = meld
+		print(meld) #TODO delete
+		print("Player ", player_id, " successfully hit on player ", id, "'s meld!")
+		rpc("sync_melds_with_clients", melds)
+		server_meld_result(true, selected_cards)
+	else:
+		print("Invalid hit request. Player ", player_id, " attempted to hit.")
 
 # HELPER: checks if meld is valid TODO!!! melds need to be certain size!!!
 func meld_check(card_datas : Array[Dictionary]) -> bool:
@@ -313,14 +337,34 @@ func attempt_player_meld(card_datas : Array[Dictionary]) -> void:
 	else: 
 		print("Not a valid meld. Sets must be of same rank. Runs must be of same
 		suit and consecutive.")
-		rpc_id(player_id, "player_meld_result", false, card_datas)
 
-@rpc("unreliable", "call_local")
+@rpc("reliable", "any_peer")
 func player_meld_result(success: bool, card_datas: Array[Dictionary]) -> void:
 	if success:
 		for card_data in card_datas:
 			rpc_id(1, "remove_from_player_hand", card_data)
 			print("Meld was successful: ", success)
+
+@rpc("reliable", "any_peer")
+func player_hit(id : int, meld : Array[Dictionary], selected_cards : Array[Dictionary]) -> void:
+	var player_id = multiplayer.get_remote_sender_id()
+	
+	if !melds.has(player_id):
+		print("Only those who have placed a meld can hit!")
+		return
+	
+	meld.append_array(selected_cards)
+	
+	print("selected cards ", selected_cards)
+	# double checking id and checking if valid meld
+	if meld_check(meld) && melds.has(id):
+		melds[id] = meld
+		print(meld, "sh ", selected_cards) #TODO delete
+		print("Player ", player_id, " successfully hit on player ", id, "'s meld!")
+		rpc("sync_melds_with_clients", melds)
+		rpc_id(player_id, "player_meld_result", true, selected_cards)
+	else:
+		print("Invalid hit request. Player ", player_id, " attempted to hit.")
 
 ### SERVER SETUP
 
