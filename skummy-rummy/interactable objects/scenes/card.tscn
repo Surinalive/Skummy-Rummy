@@ -1,55 +1,25 @@
-[gd_scene load_steps=2 format=3 uid="uid://ll7vguxv7su0"]
+[gd_scene load_steps=3 format=3 uid="uid://ll7vguxv7su0"]
 
 [ext_resource type="Script" uid="uid://b8slykyvq7mvi" path="res://interactable objects/scripts/card.gd" id="1_g7eid"]
 
-[node name="Card" type="Control"]
-layout_mode = 3
-anchors_preset = 0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eupew"]
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.8, 0.027451, 1)
+border_blend = true
+
+[node name="Card" type="Button"]
+offset_right = 28.0
+offset_bottom = 36.0
 size_flags_horizontal = 3
-script = ExtResource("1_g7eid")
-
-[node name="ColorRect" type="ColorRect" parent="."]
-layout_mode = 0
-offset_right = 95.0
-offset_bottom = 138.0
-
-[node name="rank" type="Label" parent="ColorRect"]
-layout_mode = 0
-offset_right = 95.0
-offset_bottom = 138.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 21
-text = "rank"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="suit_top" type="Label" parent="ColorRect"]
-layout_mode = 0
-offset_left = 26.0
-offset_right = 94.0
-offset_bottom = 18.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 13
-text = "suit"
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="suit_bottom" type="Label" parent="ColorRect"]
-layout_mode = 0
-offset_left = 2.0
-offset_top = 120.0
-offset_right = 74.0
-offset_bottom = 138.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 13
-text = "suit"
-vertical_alignment = 1
-
-[node name="Button" type="Button" parent="."]
-layout_mode = 0
-offset_right = 95.0
-offset_bottom = 138.0
+theme_override_styles/pressed = SubResource("StyleBoxFlat_eupew")
 disabled = true
 toggle_mode = true
+keep_pressed_outside = true
+expand_icon = true
+script = ExtResource("1_g7eid")
 
-[connection signal="toggled" from="Button" to="." method="_on_button_toggled"]
+[connection signal="toggled" from="." to="." method="_on_toggled"]

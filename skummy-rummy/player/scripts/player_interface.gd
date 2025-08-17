@@ -5,7 +5,7 @@ extends CanvasLayer
 
 const CARD_SCENE_PATH = "res://interactable objects/scenes/card.tscn"
 
-@onready var selected_cards : Array[Card]= []
+@onready var selected_cards : Array[Dictionary]= []
 @onready var player : Player = get_parent()
 @onready var player_cards : Array[Card]= []
 
@@ -29,6 +29,7 @@ func display_hand(hand : Array = player.card_data_hand) -> void:
 		card.set_id(card_data["deck_id"])
 		card.set_suit(card_data["suit"])
 		card.set_rank(card_data["rank"])
+		card.set_icon()
 		player_cards.append(card)
 		$PlayerHand.add_child(card)
 		card.connect("card_selected", _on_card_selected)
@@ -48,14 +49,9 @@ func display_drawn_card(card_data) -> void:
 	cards_clickable()
 	buttons_visible(true)
 	
-	# Load card from data given
-	var card_scene = preload(CARD_SCENE_PATH)
-	var card = card_scene.instantiate()
-	card.set_id(card_data["deck_id"])
-	card.set_suit(card_data["suit"])
-	card.set_rank(card_data["rank"])
-	
-	$DrawnCard.add_child(card)
+	# Load card_image from data given
+	$DrawnCard/CardImage.set_card_data(card_data)
+	$DrawnCard/CardImage.set_icon()
 
 ## Allows cards in hand to be selected
 func cards_clickable() -> void:
@@ -77,7 +73,8 @@ func _on_select_button_pressed() -> void:
 	if player.at_spawn:
 		at_spawn_select()
 	else:
-		at_table_select()
+		player.attempt_meld(selected_cards)
+		reset()
 
 # HELPER
 func at_spawn_select() -> void:
@@ -94,22 +91,8 @@ func at_spawn_select() -> void:
 	else:
 		selected_card = selected_cards.get(0)
 	
-	var drawn_card : Card = get_drawn_card()
-	
 	# Remove drawn card from deck and add selected card to deck
-	player.trade(get_card_data(drawn_card), get_card_data(selected_card))
-	
-	reset()
-
-# HELPER
-func at_table_select() -> void:
-	
-	# Was attempted meld successful?
-	if (player.attempt_meld(selected_cards)):
-		
-	# Remove cards from player hand and player interface
-		for card in selected_cards:
-			player.remove_card_from_hand(get_card_data(card))
+	player.trade($DrawnCard/CardImage.get_card_data(), selected_card)
 	
 	reset()
 
@@ -128,28 +111,21 @@ func _on_reject_button_pressed() -> void:
 func _on_card_selected(card : Card) -> void:
 	if player.at_spawn:
 		untoggle_rest(card)
-		selected_cards = [card]
+		selected_cards = [get_card_data(card)]
 	if player.at_table:
-		selected_cards.append(card)
+		selected_cards.append(get_card_data(card))
 
 # HELPER: When player selects a card in hand, others are unselected at spawn
 func untoggle_rest(selected_card : Card) -> void:
 	for card in $PlayerHand.get_children(false):
-		if card != $PlayerHand/ReferenceRect:
-			if card != selected_card:
-				card.unpress_button()
+		if card != selected_card:
+			card.unpress_button()
 
 #TODO quick fix for error....error with multiplayer
 func _on_card_unselected(card : Card) -> void:
-	var selected_card = selected_cards.find(card)
-	if (selected_card > -1):
-		selected_cards.remove_at(selected_card)
-
-# HELPER
-func get_drawn_card() -> Node:
-	for card in $DrawnCard.get_children(false):
-			return card
-	return null
+	var selected_card_index = selected_cards.find(get_card_data(card))
+	if (selected_card_index > -1):
+		selected_cards.remove_at(selected_card_index)
 
 # HELPER
 func get_selected_card() -> Node:
@@ -161,7 +137,8 @@ func get_selected_card() -> Node:
 # HELPER
 func reset() -> void:
 	# Removes the drawn card from the screen
-	$DrawnCard.remove_child(get_drawn_card())
+	$DrawnCard/CardImage.reset_icon()
+	player.meld_interface_visible(false)
 	
 	# Resets player interface
 	selected_cards = []

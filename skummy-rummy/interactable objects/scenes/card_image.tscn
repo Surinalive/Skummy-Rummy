@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://y1hs1pjj744m"]
+
+[ext_resource type="Script" uid="uid://m1j1psn0aabg" path="res://interactable objects/scripts/texture_rect.gd" id="1_ru0rv"]
+
+[node name="CardImage" type="TextureRect"]
+expand_mode = 3
+script = ExtResource("1_ru0rv")

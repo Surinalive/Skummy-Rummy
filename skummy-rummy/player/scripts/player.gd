@@ -58,6 +58,7 @@ func _input(event):
 			set_physics_process(false)
 			$PlayerInterface.cards_clickable()
 			$PlayerInterface.buttons_visible(true)
+			meld_interface_visible(true)
 
 		if at_spawn:
 			$PlayerInterface.display_drawn_card(spawn_area.draw_card())
@@ -143,11 +144,19 @@ func trade(drawn_card : Dictionary, selected_card : Dictionary):
 	else:
 		Server.rpc_id(1, "trade", drawn_card, selected_card)
 
-func attempt_meld(cards : Array[Card]) -> bool:
-	if (table_area.attempt_meld(cards)):
-		return true
-	return false
+func attempt_meld(card_datas : Array[Dictionary]) -> void:
+	if multiplayer.is_server():
+		Server.attempt_server_meld(card_datas)
+	else:
+		Server.rpc_id(1, "attempt_player_meld", card_datas)
 
 ### MISC
 func hide_interface() -> void:
 	$PlayerInterface.visible = false
+
+func meld_interface_visible(value : bool) -> void:
+	if value:
+		$Melds.visible = true
+		$Melds.display_melds()
+	else:
+		$Melds.visible = false

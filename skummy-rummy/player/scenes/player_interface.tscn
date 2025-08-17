@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://bdmf52q2ck8rl"]
+[gd_scene load_steps=4 format=3 uid="uid://bdmf52q2ck8rl"]
 
 [ext_resource type="Script" uid="uid://bv8m08cp11fp2" path="res://player/scripts/player_interface.gd" id="1_dyfmo"]
+[ext_resource type="PackedScene" uid="uid://ll7vguxv7su0" path="res://interactable objects/scenes/card.tscn" id="2_tb0kc"]
+[ext_resource type="PackedScene" uid="uid://y1hs1pjj744m" path="res://interactable objects/scenes/card_image.tscn" id="3_gg244"]
 
 [node name="PlayerInterface" type="CanvasLayer" node_paths=PackedStringArray("player_hand")]
 script = ExtResource("1_dyfmo")
@@ -11,13 +13,21 @@ offset_left = 63.0
 offset_top = 512.0
 offset_right = 1089.0
 offset_bottom = 648.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 0
+
+[node name="Card" parent="PlayerHand" instance=ExtResource("2_tb0kc")]
+layout_mode = 2
 
 [node name="DrawnCard" type="MarginContainer" parent="."]
 offset_left = 450.0
 offset_top = 246.0
 offset_right = 580.0
 offset_bottom = 445.0
+
+[node name="CardImage" parent="DrawnCard" instance=ExtResource("3_gg244")]
+layout_mode = 2
 
 [node name="SelectButton" type="Button" parent="."]
 visible = false

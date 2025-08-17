@@ -10,6 +10,7 @@ extends Control
 @onready var card_rank: int
 @onready var card_suit: int
 @onready var selected = false
+@onready var texture : String
 
 signal card_selected(card)
 signal card_unselected(card)
@@ -21,31 +22,29 @@ func set_id(id: int) -> void:
 
 func set_rank(rank: int) -> void:
 	card_rank = rank
-	$ColorRect/rank.text = str(rank)
 
 func set_suit(suit: int) -> void:
 	card_suit = suit
-	var text
 
 	match suit :
 		1:
-			text = "club"
+			texture = "res://art/cards-png/Clubs/Clubs_card_"
 		2: 
-			text = "diamond"
+			texture = "res://art/cards-png/Diamonds/Diamonds_card_"
 		3:
-			text = "heart"
+			texture = "res://art/cards-png/Hearts/Hearts_card_"
 		4: 
-			text = "spade"
-	
-	$ColorRect/suit_top.text = text
-	$ColorRect/suit_bottom.text = text
+			texture = "res://art/cards-png/Spades/Spades_card_"
+
+func set_icon() -> void:
+	var path  = texture + str(card_rank) + ".png"
+	$".".icon = load(path)
 
 func set_clickable() -> void:
-	$Button.disabled = false
+	self.disabled = false
 
 func set_unclickable() -> void:
-	$Button.disabled = true
-	$ColorRect.color = Color(1, 1, 1, 1)
+	self.disabled = true
 
 ### GETTERS
 
@@ -60,16 +59,14 @@ func get_suit() -> int:
 
 ### SIGNAL LOGIC
 
-func _on_button_toggled(toggled_on: bool) -> void:
-
+func _on_toggled(toggled_on: bool) -> void:
 	if toggled_on:
 		selected = true
-		$ColorRect.color = Color(0, 1, 1, 1)
 		card_selected.emit(self)
 	else:
 		selected = false
-		$ColorRect.color = Color(1, 1, 1, 1)
 		card_unselected.emit(self)
+		
 
 ### MISC
 
@@ -77,6 +74,5 @@ func is_selected() -> bool:
 	return selected
 
 func unpress_button() -> void:
-	$Button.set_pressed(false)
+	self.button_pressed = false
 	selected = false
-	$ColorRect.color = Color(1, 1, 1, 1)

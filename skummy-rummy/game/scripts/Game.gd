@@ -22,9 +22,11 @@ var player_info = {"name": "Name"}
 var player_hands = {}
 var players_loaded = 0
 var deck_cards = {}
+var melds = {}
 
 #signal loaded() #logic for scene manager
 signal hands_synchronized
+signal melds_synchronized
 signal player_connected(peer_id, player_info)
 signal player_disconnected(peer_id)
 signal server_disconnected
@@ -52,7 +54,6 @@ func start_game():
 	generate_deck()
 	deal_hands()
 
-
 # NOTE, need to add powerup cards functionality
 ## Generates our card deck!
 func generate_deck() -> void:
@@ -69,8 +70,7 @@ func generate_deck() -> void:
 				}
 				deck_cards.set(key,card_data)
 				key += 1
-	
-###TODO!!!
+
 #If there are only two players they each get 10 cards, 
 #if there are three or four player then each player gets 7 cards.
 ## Deals out all player hands
@@ -93,7 +93,6 @@ func deal_hands() -> void:
 			var card_data = draw()
 			hand.append(card_data)
 
-			#TODO: remember to add cards back to deck
 			deck_cards.erase(deck_cards.find_key(card_data))
 		player_hands[player] = hand
 		
@@ -141,8 +140,75 @@ func server_remove_from_player_hand(card_data) -> void:
 	# Server tells everyone that the hand has changed
 	rpc("sync_hands_with_clients", player_hands, deck_cards)
 
-### GAME LOGIC
+func attempt_server_meld(card_datas : Array[Dictionary]) -> void:
+	# Get ID of the peer who sent the rpc
+	var player_id = multiplayer.get_unique_id()
+	
+	if melds.has(player_id):
+		print("Player: ", player_id, " has already placed a meld.")
+		return
+	
+	for card_data in card_datas:
+		if !player_hands.has(player_id) or !player_hands[player_id].has(card_data):
+			print("Server: Invalid remove request. Player ", player_id, " does not have this card.")
+			return
+	
+	if meld_check(card_datas):
+		melds[player_id] = card_datas
+		print("Player: ", player_id, " has successfully placed a meld")
+		rpc("sync_melds_with_clients", melds)
+		server_meld_result(true, card_datas)
+		return
+	else: 
+		print("Not a valid meld. Sets must be of same rank. Runs must be of same
+		suit and consecutive.")
+		server_meld_result(false, card_datas)
+		return
 
+func server_meld_result(success: bool, card_datas: Array[Dictionary]) -> void:
+	if success:
+		for card_data in card_datas:
+			server_remove_from_player_hand(card_data)
+			print("Meld was successful: ", success)
+
+# HELPER: checks if meld is valid TODO!!! melds need to be certain size!!!
+func meld_check(card_datas : Array[Dictionary]) -> bool:
+	#if card_datas.size() < 3: #TODO
+		#print("melds must contain 3 or more cards")
+		#return false
+	return check_run(card_datas) or check_set(card_datas)
+
+# HELPER: checks if meld is a run
+func check_run(card_datas : Array[Dictionary]) -> bool:
+	var ranks = []
+	var suit = card_datas[0]["suit"]
+	
+	for card_data in card_datas:
+		if card_data["suit"] != suit:
+			return false
+		ranks.append(card_data["rank"])
+	
+	ranks.sort()
+	
+	for i in ranks.size() - 2:
+		if (ranks[i] != ranks[i + 1] - 1):
+			return false
+	
+	return true
+
+# HELPER: checks if meld is a set
+func check_set(card_datas : Array[Dictionary]) -> bool:
+	var rank = card_datas[0]["rank"]
+	
+	for card_data in card_datas:
+		if card_data["rank"] != rank:
+			return false
+			
+	return true
+
+
+### GAME LOGIC
+#TODO refactor this to three different functions & signals
 # This function runs on all clients (and the server)
 @rpc("reliable", "call_local")
 func sync_hands_with_clients(new_player_hands, new_deck_cards):
@@ -152,7 +218,13 @@ func sync_hands_with_clients(new_player_hands, new_deck_cards):
 	self.deck_cards = new_deck_cards
 	print("Peer ", multiplayer.get_unique_id(), " Received synchronized hands")
 	
-	hands_synchronized.emit()
+	hands_synchronized.emit() #TODO
+
+@rpc("reliable", "call_local")
+func sync_melds_with_clients(new_melds):
+	self.melds = new_melds
+	print("Peer ", multiplayer.get_unique_id(), " Received synchonized melds")
+	melds_synchronized.emit()
 
 @rpc("reliable", "authority")
 func get_player_hand() -> Array:
@@ -162,6 +234,10 @@ func get_player_hand() -> Array:
 	else:
 		print("error")
 		return []
+
+@rpc("reliable", "authority")
+func get_melds() -> Dictionary:
+	return melds
 
 # Draws a random card from the deck
 @rpc("reliable", "authority")
@@ -175,7 +251,7 @@ func draw() -> Dictionary:
 func trade(drawn_card_data : Dictionary, player_card_data : Dictionary) -> void:
 	# Get ID of the peer who sent the rpc
 	var player_id = multiplayer.get_remote_sender_id()
-	print("hi")
+	
 	if !player_hands.has(player_id) or !player_hands[player_id].has(player_card_data):
 		print("Server: Invalid discard request. Player ", player_id, " does not have this card.")
 		return
@@ -210,23 +286,41 @@ func remove_from_player_hand(card_data) -> void:
 		
 	# Server removes card from players hand
 	player_hands[player_id].remove_at(player_hands[player_id].find(card_data))
-	print("Server: Player ", player_id, " traded a card.")
+	print("Server: Player ", player_id, " has removed a card.")
 	
 	# Server tells everyone that the hand has changed
 	rpc("sync_hands_with_clients", player_hands, deck_cards)
 
+@rpc ("reliable", "any_peer")
+func attempt_player_meld(card_datas : Array[Dictionary]) -> void:
+	# Get ID of the peer who sent the rpc
+	var player_id = multiplayer.get_remote_sender_id()
+	
+	if melds.has(player_id):
+		print("Player: ", player_id, "has already placed a meld.")
+		return
+	
+	for card_data in card_datas:
+		if !player_hands.has(player_id) or !player_hands[player_id].has(card_data):
+			print("Server: Invalid remove request. Player ", player_id, " does not have this card.")
+			return
+	
+	if meld_check(card_datas):
+		melds[player_id] = card_datas
+		print("Player: ", player_id, " has successfully placed a meld")
+		rpc("sync_melds_with_clients", melds)
+		rpc_id(player_id, "player_meld_result", true, card_datas)
+	else: 
+		print("Not a valid meld. Sets must be of same rank. Runs must be of same
+		suit and consecutive.")
+		rpc_id(player_id, "player_meld_result", false, card_datas)
 
-# NOTE tutorial has this named game_over()... NOt suitable to our purposes
-#func _on_player_hit() -> void:
-	#pass # Replace with function body.
-
-#func new_game():
-	#$StartTimer.start()
-
-#NOTE the tutorial had this start two other timers....
-#func _on_start_timer_timeout() -> void:
-	#pass # Replace with function body.
-	#
+@rpc("unreliable", "call_local")
+func player_meld_result(success: bool, card_datas: Array[Dictionary]) -> void:
+	if success:
+		for card_data in card_datas:
+			rpc_id(1, "remove_from_player_hand", card_data)
+			print("Meld was successful: ", success)
 
 ### SERVER SETUP
 
