@@ -54,10 +54,12 @@ func start_game():
 	generate_deck()
 	deal_hands()
 
-func _process(_delta) -> void:
-	for hand in player_hands.values():
-		if hand.size() == 0:
-			print(" A player won!! ")
+func reset():
+	player_hands = {}
+	deck_cards = {}
+	melds = {}
+	start_game()
+
 
 # NOTE, need to add powerup cards functionality
 ## Generates our card deck!
@@ -66,7 +68,7 @@ func generate_deck() -> void:
 		return
 	var key = 0
 	for l in 2:
-		for i in 4:
+		for i in 1: # TODO change back to 4!!
 			for j in 13:
 				var card_data = {
 					"deck_id" : key,
@@ -183,24 +185,33 @@ func server_hit(id : int, meld : Array[Dictionary], selected_cards : Array[Dicti
 		print("Only those who have placed a meld can hit!")
 		return
 	
-	meld.append_array(selected_cards)
+	var new_meld = meld.duplicate(false)
+	new_meld.append_array(selected_cards)
 	
 	# double checking id and checking if valid meld
-	if meld_check(meld) && melds.has(id):
-		melds[id] = meld
-		print(meld) #TODO delete
+	if meld_check(new_meld) && melds.has(id):
+		melds[id] = new_meld
+		print(new_meld) #TODO delete
 		print("Player ", player_id, " successfully hit on player ", id, "'s meld!")
 		rpc("sync_melds_with_clients", melds)
 		server_meld_result(true, selected_cards)
 	else:
 		print("Invalid hit request. Player ", player_id, " attempted to hit.")
 
+func server_check_win() -> void:
+	var player_id = multiplayer.get_unique_id()
+	if player_hands[player_id].size() == 0:
+		print("Player ", player_id, " has won the game!")
+	reset()
+
+#TODO !! game let me hit (3) on a run (1,2,3). MUST CHECK FOR DOUBLES
+
 # HELPER: checks if meld is valid TODO!!! melds need to be certain size!!!
 func meld_check(card_datas : Array[Dictionary]) -> bool:
 	#if card_datas.size() < 3: #TODO
 		#print("melds must contain 3 or more cards")
 		#return false
-	return check_run(card_datas) or check_set(card_datas)
+	return check_run(card_datas) != check_set(card_datas)
 
 # HELPER: checks if meld is a run
 func check_run(card_datas : Array[Dictionary]) -> bool:
@@ -214,10 +225,12 @@ func check_run(card_datas : Array[Dictionary]) -> bool:
 	
 	ranks.sort()
 	
-	for i in ranks.size() - 2:
+	print(ranks)
+	
+	for i in ranks.size() - 1:
 		if (ranks[i] != ranks[i + 1] - 1):
 			return false
-	
+		print(ranks[i], " compared to ", ranks[i + 1])
 	return true
 
 # HELPER: checks if meld is a set
@@ -349,22 +362,34 @@ func player_meld_result(success: bool, card_datas: Array[Dictionary]) -> void:
 func player_hit(id : int, meld : Array[Dictionary], selected_cards : Array[Dictionary]) -> void:
 	var player_id = multiplayer.get_remote_sender_id()
 	
+	#Do I want to do a deep copy? I'm not modifying any elements....
+	
+
 	if !melds.has(player_id):
 		print("Only those who have placed a meld can hit!")
 		return
 	
-	meld.append_array(selected_cards)
+	var new_meld = meld.duplicate(false)
+	new_meld.append_array(selected_cards)
+	
 	
 	print("selected cards ", selected_cards)
 	# double checking id and checking if valid meld
-	if meld_check(meld) && melds.has(id):
-		melds[id] = meld
-		print(meld, "sh ", selected_cards) #TODO delete
+	if meld_check(new_meld) && melds.has(id):
+		melds[id] = new_meld
+		print(new_meld, "sh ", selected_cards) #TODO delete
 		print("Player ", player_id, " successfully hit on player ", id, "'s meld!")
 		rpc("sync_melds_with_clients", melds)
 		rpc_id(player_id, "player_meld_result", true, selected_cards)
 	else:
 		print("Invalid hit request. Player ", player_id, " attempted to hit.")
+
+@rpc("reliable", "any_peer")
+func player_check_win() -> void:
+	var player_id = multiplayer.get_remote_sender_id()
+	if player_hands[player_id].size() == 0:
+		print("Player ", player_id, " has won the game!")
+	reset()
 
 ### SERVER SETUP
 

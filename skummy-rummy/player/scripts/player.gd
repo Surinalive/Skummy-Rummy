@@ -47,6 +47,14 @@ func _physics_process(_delta):
 	velocity = input_direction * speed
 	move_and_slide()
 
+	if card_data_hand.size() == 0:
+		if multiplayer.is_server():
+			Server.server_check_win()
+		else:
+			Server.rpc_id(1, "player_check_win")
+
+	
+
 # used to check for single events....
 func _input(event):
 	if !is_multiplayer_authority():
